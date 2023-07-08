@@ -68,7 +68,7 @@ body { margin:0; padding:0; }
 
 <script>
 function popupFunction() {
-   alert("法務省地図XMLのうち、任意の地区の公共座標のものを表示しています。<br />重要土地等調査法の注視地区・特別注視地区の区域は一部のものを目視でトレースしたものであり正確ではありませんし、網羅的でもありませｎ。<br />町の境界は国勢調査用のものであり、住居表示や地番地区の境界と必ずしも一致しません")
+   alert("法務省地図XMLのうち、任意の地区の公共座標のものを表示しています。<br />重要土地等調査法の注視地区・特別注視地区の区域は一部のものを目視でトレースしたものであり正確ではありませんし、網羅的でもありません。<br /> 町の境界は国勢調査用のものであり、住居表示や地番地区の境界と必ずしも一致しません")
 }
 
 var map = new maplibregl.Map({
@@ -245,7 +245,7 @@ map.on('load', function(){
   
 //UI
 //map.addControl(new maplibregl.AttributionControl({customAttribution: "GSI Map Vector." , compact: true}));
-map.addControl(new maplibregl.AttributionControl({customAttribution: "<br />登記所備付地図データについては、公共座標のものだけを表示しています。精度区分は線色を変えて表現しています。<br />（青：甲一、甲二、緑：甲三、乙一、水色：乙二、乙三、ピンク：その他（null等））<br />町の境界については総務省統計局のデータです。地番区域、住居区域と必ずしも一致しません。" }));
+map.addControl(new maplibregl.AttributionControl({customAttribution: "<br />登記所備付地図データについては、公共座標のものだけを表示しています。精度区分は線色を変えて表現しています。<br />（青：甲一、甲二、緑：甲三、乙一、水色：乙二、乙三、ピンク：その他（null等））<br />区域図外縁線は正確ではありません。おおよその位置を示すため目視で少し広めにトレースしました。<br />町の境界については総務省統計局のデータです。地番区域、住居区域と必ずしも一致しません。" }));
 map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 map.addControl(new maplibregl.ScaleControl() );
 
