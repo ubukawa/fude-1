@@ -16,6 +16,8 @@
 - 32528_隠岐郡隠岐の島町_公共座標3系_筆R.geojson
 - 42209_対馬市_公共座標1系_筆R.geojson
 - 42211_五島市_公共座標1系_筆R.geojson
+  東京都所属市町村未定の鳥島のデータは入っていません。
 
 # Sample map
 https://ubukawa.github.io/fude-1/map01.html
+https://ubukawa.github.io/fude-1/map02.html
