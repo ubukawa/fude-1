@@ -217,6 +217,16 @@ map.on('load', function(){
       'text-color':'#663399'
     }
   })
+
+  slider.addEventListener('input',(e) => {
+    map.setPaintProperty(
+    'gsi-photo',
+    'raster-opacity',
+    parseInt(e.target.value, 10) / 100
+  )
+  sliderValue.textContent = e.target.value + '%';   
+})
+
   //legend
   const legend_target = {
     'geojson_area_A': '注視地区（ダミー）',
