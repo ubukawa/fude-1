@@ -62,7 +62,7 @@ map.on('load', function(){
     maxzoom:10
   });
   map.addLayer({
-    'minzoom':10, 
+    'minzoom':11, 
     'maxzoom':21,
     'id':'fude',
     'type':'line',
@@ -130,12 +130,12 @@ map.on('load', function(){
     'type':'line',
     'source':'area_geojson',
     'paint':{
-      'line-color':'#FF0000',
+      'line-color':'#FF0000'
       'line-width': 2
     }
   })
   map.addLayer({
-    'minzoom':8, //about 1:10,000 scale
+    'minzoom':10, //about 1:10,000 scale
     'maxzoom':17, //about 1:10,000 scale
     'id':'machi-l', //町字
     'type':'line',
