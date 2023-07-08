@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>Test- fude1 </title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://ubukawa.github.io/cmv-test/maplibre-gl@2.4.0/maplibre-gl.js'></script>
+<link href='https://ubukawa.github.io/cmv-test/maplibre-gl@2.4.0/maplibre-gl.css' rel='stylesheet' />
+<link href='https://ubukawa.github.io/cmv-test/watergis/maplibre-gl-export@1.3.8/maplibre-gl-export.css' rel='stylesheet' />
+<script src='https://ubukawa.github.io/cmv-test/watergis/maplibre-gl-export@1.3.8/maplibre-gl-export.js'></script>
+<link href='https://ubukawa.github.io/cmv-test/watergis/maplibre-gl-legend@1.2.8/maplibre-gl-legend.css' rel='stylesheet' />
+<script src='https://ubukawa.github.io/cmv-test/watergis/maplibre-gl-legend@1.2.8/maplibre-gl-legend.js'></script>
+  
+  
+<style>
+body { margin:0; padding:0; }
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+</style>
+</head>
+<body onload="popupFunction()">
+    <style>
+        .maplibregl-popup{
+            max-width: 300px;
+        }
+        .map-overlay{
+            font-style:bold;
+            position: absolute;
+            width: 25%;
+            top: 0;
+            left: 0;
+            padding: 10px;
+        }
+        .map-overlay .map-overlay-inner {
+            background-color: cornsilk;
+            box-shadow: 0 1px 2px rgba(0,0,0, 0.2) ;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .map-overlay label{
+            display: block;
+            margin: 0 0 10px;
+        }
+        .map-overlay input {
+            background-color: transparent;
+            display: inline-block;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            cursor: ew-resize;
+        }
+    </style>
+    
+
+<div id='map'></div>
+
+<div class="map-overlay top">
+    <div class="map-overlay-inner">
+        <label>写真レイヤ透明度: <span id="slider-value">100%</span></label>
+        <input id="slider" type="range" min="0" max="100" step="0" value="100">
+    </div>
+</div>
+
+<script>
+function popupFunction() {
+   alert("法務省地図XMLのうち、任意の地区の公共座標のものを表示しています。<br />重要土地等調査法の注視地区・特別注視地区の区域は一部のものを目視でトレースしたものであり正確ではありませんし、網羅的でもありませｎ。<br />町の境界は国勢調査用のものであり、住居表示や地番地区の境界と必ずしも一致しません")
+}
+
+var map = new maplibregl.Map({
+  container: 'map', 
+  attributionControl: false, //true,
+  hash: true, 
+  //renderWorldCopies: false,
+  style: 'https://gsi-cyberjapan.github.io/optimal_bvmap/style/std.json', // style file path
+  center: [138.781, 36.631], // center [lng, lat]　
+  zoom: 6, // zoom level at loading
+  maxPitch: 85,
+  maxZoom: 4, // min zoom
+  maxZoom: 20 // max zoom
+});
+
+const slider = document.getElementById('slider')
+const sliderValue = document.getElementById('slider-value')
+
+map.on('load', function(){
+  map.addSource('area_geojson',{
+    type: 'geojson',
+    data: 'https://ubukawa.github.io/fude-1/kuiki.geojson'
+  });
+  map.addSource('fude1',{
+    type: 'vector',
+    tiles: ['https://ubukawa.github.io/fude-1/zxy1/{z}/{x}/{y}.pbf'],
+    minzoom:10,
+    maxzoom:15
+  });
+  map.addSource('estat',{
+    type: 'vector',
+    tiles: ['https://ubukawa.github.io/estat01/04_tiles/zxy-s/{z}/{x}/{y}.pbf'],
+    minzoom:8,
+    maxzoom:10
+  });
+  map.addSource('gsi-photo',{
+    type: 'raster',
+    tiles: ['https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'],
+    attribution: '地理院地図タイル（写真）-国土地理院',
+    minzoom:8,
+    maxzoom:18
+  });
+  map.addLayer({
+        'id':'gsi-photo',
+        'source':'gsi-photo',
+        'type':'raster'
+    })
+  map.addLayer({
+    'minzoom':11, 
+    'maxzoom':21,
+    'id':'fude',
+    'type':'line',
+    'source':'fude1',
+    'source-layer': 'fude',
+    'paint':{
+//      'line-color':'#0000FF',
+      'line-color':[
+        'match',
+        ['get','精度区分'],
+        ['甲一','甲二'],
+        '#0000FF',
+        ['甲三','乙一'],
+        '#00FF00',
+        ['乙二','乙三'],
+        '#00FFFF',
+        '#FF00FF'
+      ],
+      'line-width': 0.7
+    }
+  })
+  map.addLayer({
+    'minzoom':16, 
+    'maxzoom':21,
+    'id':'fude-label',
+    'type':'symbol',
+    'source':'fude1',
+    'source-layer': 'fude',
+    'layout':{
+      'text-field': ['get','QGIS_ID'],
+      'text-font':['NotoSerifJP-SemiBold'],
+      'text-size': 10
+    },
+    'paint':{
+      'text-color':[
+        'match',
+        ['get','精度区分'],
+        ['甲一','甲二'],
+        '#0000FF',
+        ['甲三','乙一'],
+        '#00FF00',
+        ['乙二','乙三'],
+        '#00FFFF',
+        '#FF00FF'
+      ],
+      'text-halo-color': 'rgba(255,255,255,0.5)',
+      'text-halo-width':1
+    }
+  })
+  map.addLayer({
+    'filter':['==',['get','typecode'],1],
+    'maxzoom':15, //about 1:10,000 scale
+    'id':'geojson_area_A', //注視地区
+    'type':'line',
+    'source':'area_geojson',
+    'paint':{
+      'line-color':'#000000',
+      'line-width': 2
+    }
+  })
+  map.addLayer({
+    'filter':['==',['get','typecode'],2],
+    'maxzoom':15, //about 1:10,000 scale
+    'id':'geojson_area_B', //特別注視地区
+    'type':'line',
+    'source':'area_geojson',
+    'paint':{
+      'line-color':'#FF0000',
+      'line-width': 2
+    }
+  })
+  map.addLayer({
+    'minzoom':10, //about 1:10,000 scale
+    'maxzoom':17, //about 1:10,000 scale
+    'id':'machi-l', //町字
+    'type':'line',
+    'source':'estat',
+    'source-layer': 'bnd',
+    'paint':{
+      'line-color':'#663399',
+      'line-width': 2
+    }
+  })
+  map.addLayer({
+    'minzoom':12, //about 1:10,000 scale
+    'maxzoom':17, //about 1:10,000 scale
+    'id':'machi-label', //町字
+    'type':'symbol',
+    'source':'estat',
+    'source-layer': 'bnd',
+    'layout':{
+        'text-field': ['get','S_NAME'],
+        'text-font': ['NotoSerifJP-SemiBold'],
+        'text-size': 10
+    },
+    'paint':{
+      'text-color':'#663399'
+    }
+  })
+  //legend
+  const legend_target = {
+    'geojson_area_A': '注視地区（ダミー）',
+    'geojson_area_B': '特別注視地区（ダミー）',
+    'fude': '登記所備付地図データ',
+    'fude-label': '登記所備付地図データ （ラベル）',
+    'machi-l':'eStatライン',
+    'machi-label':'eStatラベル'
+  };
+  map.addControl(new MaplibreLegendControl(legend_target, {
+    showDefault: false,
+    onlyRendered: true,
+    reverseOrder: false
+  }), 'bottom-left');
+})
+  
+//UI
+//map.addControl(new maplibregl.AttributionControl({customAttribution: "GSI Map Vector." , compact: true}));
+map.addControl(new maplibregl.AttributionControl({customAttribution: "<br />登記所備付地図データについては、公共座標のものだけを表示しています。精度区分は線色を変えて表現しています。<br />（青：甲一、甲二、緑：甲三、乙一、水色：乙二、乙三、ピンク：その他（null等））<br />町の境界については総務省統計局のデータです。地番区域、住居区域と必ずしも一致しません。" }));
+map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+map.addControl(new maplibregl.ScaleControl() );
+
+//Export
+map.addControl(new MaplibreExportControl({
+  PageSize: Size.A4,
+  PageOrientation: PageOrientation.Portrait,
+  Format: Format.PNG,
+  DPI: DPI[96],
+  //Crosshair: true,
+  PrintableArea: true,
+  Local: 'en'
+}), 'top-right');
+
+
+
+//debug
+//map.showTileBoundaries = true;
+map.showTileBoundaries = false;
+map.showCollisionBoxes = false;
+
+</script>
+ 
+</body>
+</html>
